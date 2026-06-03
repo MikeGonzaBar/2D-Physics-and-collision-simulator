@@ -1,197 +1,189 @@
 # 2D Physics and Collision Simulator
 
-A Java-based 2D physics simulation engine that demonstrates real-time collision detection, gravity effects, and multi-object interactions in a graphical environment.
+Educational Java/Swing project for experimenting with a simple 2D physics loop,
+basic vector math, gravity, rendering, and collision response between circles,
+rectangles, and triangles.
 
-## 🎯 Overview
+The project is intentionally small: it is useful as an object-oriented
+programming exercise and as a base for learning how a game-style update loop is
+structured.
 
-This project implements a complete 2D physics simulation system with the following capabilities:
-- Real-time collision detection between various 2D shapes
-- Gravity simulation and force application
-- Multi-threaded rendering and physics calculations
-- Support for multiple geometric shapes (Rectangles, Circles, Triangles, Polygons)
-- Configurable simulation parameters and window properties
+## Demo
 
-## ✨ Features
+Static platforms with dynamic circles and rectangles:
 
-### Physics Engine
-- **Collision Detection**: Advanced collision detection between different 2D shapes
-- **Gravity Simulation**: Realistic gravity effects applied to all objects
-- **Force System**: Configurable force application and physics calculations
-- **Velocity and Acceleration**: Full kinematic simulation with velocity and acceleration vectors
+[Watch the static-platform demo](media/simulator-static-platforms.mp4)
 
-### Supported Shapes
-- **Rectangles**: Axis-aligned rectangles with customizable dimensions
-- **Circles**: Perfect circles with radius-based collision detection
-- **Triangles**: Triangular shapes with vertex-based collision
-- **Polygons**: Extensible polygon system for complex shapes
+Rectangle collision regression check:
 
-### Rendering System
-- **60 FPS Rendering**: Smooth real-time visualization
-- **Multi-threaded Architecture**: Separate threads for physics and rendering
-- **Configurable Window**: Customizable window size, title, and scale
-- **Real-time FPS Display**: On-screen frame rate monitoring
+[Watch the rectangle-collision demo](media/simulator-rectangle-collision-fixed.mp4)
 
-## 🏗️ Project Structure
+## Features
 
+- Fixed-step simulation loop targeting 60 physics updates per second.
+- Swing/AWT rendering with a double-buffered canvas.
+- Mutable `Vector2D` math for position, velocity, and acceleration.
+- Shape hierarchy for circles, rectangles, triangles, and polygon-backed shapes.
+- Gravity and linear damping applied to all simulated shapes.
+- Static bodies for fixed platforms and walls.
+- Per-shape mass for dynamic collision response.
+- Collision handling for:
+  - Circle vs circle
+  - Circle vs rectangle
+  - Circle vs triangle
+  - Rectangle vs rectangle
+  - Circles/rectangles vs window walls
+- Small no-dependency smoke test suite.
+- PowerShell scripts for build, test, run, and Javadoc generation.
+
+## Requirements
+
+- JDK 8 or newer.
+- PowerShell for the included scripts.
+
+The scripts look for Java in this order:
+
+1. `.codex-tools/jdk-17`
+2. `JAVA_HOME`
+3. `PATH`
+
+## Quick Start
+
+Build:
+
+```powershell
+.\scripts\build.ps1
 ```
+
+Run tests:
+
+```powershell
+.\scripts\test.ps1
+```
+
+Run the simulator:
+
+```powershell
+.\scripts\run.ps1
+```
+
+Generate Javadocs:
+
+```powershell
+.\scripts\javadoc.ps1
+```
+
+Generated files are written under `build/` and are ignored by git.
+
+## Physics Behavior
+
+Every `Shape2d` has three important body properties:
+
+- `setStatic(true)` makes a shape a fixed, infinite-mass collision object.
+- `setAffectedByGravity(false)` keeps a dynamic shape from receiving gravity.
+- `setMass(value)` changes how much a dynamic body moves during collision
+  resolution.
+
+The demo uses static rectangles as platforms and dynamic rectangles/circles as
+falling objects. This keeps platforms anchored while still allowing moving boxes
+to collide, bounce, and stack.
+
+## Manual Commands
+
+If you prefer raw Java commands:
+
+```powershell
+javac -d build\classes (Get-ChildItem -Recurse src -Filter *.java).FullName
+java -cp build\classes ProyectoPOO.Main
+```
+
+## Project Structure
+
+```text
 src/ProyectoPOO/
-├── Engine/                 # Core simulation engine
-│   ├── SimEngine.java     # Main simulation controller
-│   ├── Collisions.java    # Collision detection system
-│   ├── Forces.java        # Physics forces and gravity
-│   ├── Renderer.java      # Graphics rendering
-│   ├── ShapeMove.java     # Object movement calculations
-│   └── Window.java        # GUI window management
-├── Shapes2D/              # Geometric shape implementations
-│   ├── Shape2d.java       # Abstract base class for all shapes
-│   ├── Circle.java        # Circle implementation
-│   ├── Rectangle.java     # Rectangle implementation
-│   ├── Triangle.java      # Triangle implementation
-│   ├── Polygon.java       # Polygon implementation
-│   └── Vector2D.java      # 2D vector mathematics
-├── GenerateCircles.java   # Dynamic circle generation
-└── Main.java             # Application entry point
+  Engine/
+    SimEngine.java     Main simulation controller and update loop
+    Collisions.java    Collision detection and response
+    Forces.java        Gravity and force integration
+    Renderer.java      Frame rendering
+    ShapeMove.java     Position integration helper
+    Window.java        Swing/AWT window and buffer strategy
+  Shapes2D/
+    Shape2d.java       Base class for simulated shapes
+    Circle.java        Circle implementation
+    Rectangle.java     Axis-aligned rectangle implementation
+    Triangle.java      Isosceles triangle implementation
+    Polygon.java       Base class for vertex-backed shapes
+    Vector2D.java      Mutable 2D vector
+  GenerateCircles.java Optional circle generator thread
+  Main.java            Demo entry point
+
+test/ProyectoPOO/
+  PhysicsSmokeTests.java
+
+scripts/
+  build.ps1
+  test.ps1
+  run.ps1
+  javadoc.ps1
+
+media/
+  simulator-static-platforms.mp4
+  simulator-rectangle-collision-fixed.mp4
 ```
 
-## 🚀 Installation
+## Testing
 
-### Prerequisites
-- Java Development Kit (JDK) 8 or higher
-- Any Java IDE (Eclipse, IntelliJ IDEA, NetBeans) or command line tools
+The smoke tests cover:
 
-### Building the Project
+- shape constructor behavior and invalid dimensions
+- gravity, gravity opt-out, and static bodies
+- wall collisions at corners
+- circle-circle, circle-rectangle, and rectangle-rectangle separation
+- exact-touch collisions that should not jitter
+- same-center circle overlap recovery
+- mass-weighted correction
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd 2D-Physics-and-collision-simulator
-   ```
+Run them with:
 
-2. **Compile the source code**:
-   ```bash
-   javac -d bin src/ProyectoPOO/**/*.java src/ProyectoPOO/*.java
-   ```
-
-3. **Run the simulation**:
-   ```bash
-   java -cp bin ProyectoPOO.Main
-   ```
-
-## 🎮 Usage Examples
-
-### Basic Simulation Setup
-
-```java
-import ProyectoPOO.Engine.SimEngine;
-import ProyectoPOO.Shapes2D.*;
-import java.util.ArrayList;
-
-public class Example {
-    public static void main(String[] args) {
-        ArrayList<Shape2d> shapes = new ArrayList<>();
-        
-        // Create a rectangle with initial velocity
-        Rectangle rect = new Rectangle(100, 200, 80, 80);
-        rect.setVelocity(new Vector2D(-500, 500));
-        shapes.add(rect);
-        
-        // Create a circle
-        Circle circle = new Circle(300, 100, 20);
-        circle.setVelocity(new Vector2D(200, -300));
-        shapes.add(circle);
-        
-        // Start the simulation
-        SimEngine engine = new SimEngine(shapes, "My Physics Demo");
-        engine.start();
-    }
-}
+```powershell
+.\scripts\test.ps1
 ```
 
-### Dynamic Object Generation
+## Development Notes
 
-```java
-// Enable automatic circle generation
-Thread circleGenerator = new GenerateCircles(shapes);
-circleGenerator.start();
+- Keep generated `.class` files, Javadocs, and local tool downloads out of git.
+- Add Javadocs for public API behavior, but avoid documenting trivial getters.
+- Add tests for geometry math and collision edge cases before expanding the
+  physics rules.
+- Keep long-running recordings in `media/` only when they document meaningful
+  behavior. One-off local recordings belong under ignored `build/visual/`.
+- Use `shape.setStatic(true)` for fixed platforms. Static bodies are not moved
+  by forces and behave as infinite-mass collision objects.
+- Use `shape.setAffectedByGravity(false)` for dynamic objects that should move
+  from velocity/collisions but ignore gravity.
+- Use `shape.setMass(value)` to tune how much a dynamic object moves during
+  collision resolution.
+- The current collision response is intentionally simple and favors a readable
+  classroom implementation over production-grade physical accuracy.
 
-// The generator will create circles until reaching 25 objects
-```
+## Known Limitations
 
-### Custom Simulation Parameters
+- Collision response uses simple mass-aware impulses, but does not model
+  rotation, angular velocity, friction, or restitution per object.
+- Complex polygon collision detection is not implemented.
+- Triangle wall collisions are not currently handled.
+- Object collision resolution is approximate and can behave oddly with very high
+  speeds or deep overlaps.
+- The simulator is best treated as a learning project, not a replacement for
+  Box2D, JBox2D, or another mature physics engine.
 
-```java
-// Create simulation with custom window size and scale
-SimEngine engine = new SimEngine(
-    shapes,           // List of shapes
-    "Custom Demo",    // Window title
-    1024,            // Width
-    768,             // Height
-    1.5f             // Scale factor
-);
-```
+## Authors
 
-## 🔧 Configuration
+- Miguel Gonzalez Barajas ([MikeGonzaBar](https://github.com/MikeGonzaBar))
+- Pedro Garcia Romero ([DasPeter](https://github.com/DasPeter))
+- Kevin Gonzalez Gomez ([kevinglezgmz](https://github.com/kevinglezgmz))
 
-### Simulation Parameters
-- **Refresh Rate**: 60 FPS (configurable in `SimEngine.REFRESH_RATE`)
-- **Gravity**: Applied to all objects (configurable in `Forces` class)
-- **Window Size**: Default 720x640 pixels (customizable)
-- **Scale Factor**: Default 1.0 (for zoom effects)
+## License
 
-### Physics Settings
-- **Collision Detection**: Real-time between all shape types
-- **Gravity Direction**: Downward acceleration
-- **Force Application**: Configurable force magnitude and direction
-- **Object Limits**: Maximum 25 objects in simulation
-
-## 🎨 Customization
-
-### Adding New Shapes
-1. Extend the `Shape2d` abstract class
-2. Implement required methods: `getPerimeter()`, `getArea()`, `setCenter()`
-3. Add collision detection logic in `Collisions.java`
-
-### Modifying Physics
-- Adjust gravity in `Forces.java`
-- Modify collision response in `Collisions.java`
-- Change movement calculations in `ShapeMove.java`
-
-### Visual Customization
-- Modify rendering in `Renderer.java`
-- Adjust window properties in `Window.java`
-- Change color schemes and visual effects
-
-## 📊 Performance
-
-- **Target FPS**: 60 frames per second
-- **Physics Updates**: Synchronized with rendering
-- **Memory Management**: Efficient object pooling and cleanup
-- **Multi-threading**: Separate threads for physics and rendering
-
-## 🤝 Contributing
-
-This project was developed as a collaborative effort. To contribute:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 👥 Authors
-
-- **Miguel Gonzalez Barajas** ([MikeGonzaBar](https://github.com/MikeGonzaBar))
-- **Pedro Garcia Romero** ([DasPeter](https://github.com/DasPeter))
-- **Kevin Gonzalez Gomez** ([kevinglezgmz](https://github.com/kevinglezgmz))
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🐛 Known Issues
-
-- Complex polygon collision detection may have edge cases
-- High object counts (>25) may impact performance
-- Window resizing during simulation may cause visual artifacts
-
-**Note**: This simulator is designed for educational and demonstration purposes. For production physics simulations, consider using established physics engines like Box2D or JBox2D. 
+MIT. See [LICENSE](LICENSE).

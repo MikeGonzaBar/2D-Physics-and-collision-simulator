@@ -3,26 +3,27 @@ package ProyectoPOO.Engine;
 import javax.swing.JFrame;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Canvas;
-import java.awt.Graphics2D;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferStrategy;
 
+/**
+ * Swing/AWT window and buffer strategy used by the simulator.
+ */
 public class Window {
 
-    private JFrame frame;
-    private BufferedImage image;
-    private Canvas canvas;
-    private BufferStrategy bs;
-    private Graphics2D g2d;
-    private Graphics g;
+    private final JFrame frame;
+    private final BufferedImage image;
+    private final Canvas canvas;
+    private final BufferStrategy bs;
 
-    public Window(SimEngine GE){
-        image = new BufferedImage(GE.getWidth(),GE.getHeight(),BufferedImage.TYPE_INT_RGB);
+    public Window(SimEngine GE) {
+        image = new BufferedImage(GE.getWidth(), GE.getHeight(), BufferedImage.TYPE_INT_RGB);
         canvas = new Canvas();
-        Dimension dim = new Dimension((int) (GE.getWidth()*GE.getScale()),(int) (GE.getHeight()*GE.getScale()));
+        Dimension dim = new Dimension((int) (GE.getWidth() * GE.getScale()), (int) (GE.getHeight() * GE.getScale()));
         canvas.setPreferredSize(dim);
         canvas.setMaximumSize(dim);
         canvas.setMinimumSize(dim);
@@ -38,12 +39,22 @@ public class Window {
 
         canvas.createBufferStrategy(2);
         bs = canvas.getBufferStrategy();
-        g = bs.getDrawGraphics();
     }
 
-    public void update(){
-        g.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
-        bs.show();
+    public void update() {
+        do {
+            do {
+                Graphics g = bs.getDrawGraphics();
+                try {
+                    g.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
+                } finally {
+                    g.dispose();
+                }
+            } while (bs.contentsRestored());
+
+            bs.show();
+            Toolkit.getDefaultToolkit().sync();
+        } while (bs.contentsLost());
     }
 
     public BufferedImage getImage() {
@@ -54,15 +65,11 @@ public class Window {
         return canvas;
     }
 
-    public Graphics2D getG2d() {
-        return g2d;
-    }
-
-    public int getWidth(){
+    public int getWidth() {
         return canvas.getWidth();
     }
 
-    public int getHeight(){
+    public int getHeight() {
         return canvas.getHeight();
     }
 }

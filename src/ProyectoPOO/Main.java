@@ -1,58 +1,44 @@
 package ProyectoPOO;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ProyectoPOO.Engine.SimEngine;
 import ProyectoPOO.Shapes2D.*;
 
 public class Main {
-    /*public static void main(String[] args){
-      ArrayList<Shape2d> shapes = new ArrayList<>();                     ///
-        shapes.add(new Triangle(50, 600, 80, 100));                        ///
-        ((Triangle) shapes.get(0)).setVelocity(new Vector2D(0,0));         ///
-        shapes.add(new Rectangle(350, 250, 80, 80));                       ///  Input de las figuras a trazar
-        ((Rectangle) shapes.get(1)).setVelocity(new Vector2D(-400,0));     ///    
-        Thread Gen = new GenerateCircles(shapes);                          ///
-        Gen.start();                                                       ///
-        SimEngine GE = new SimEngine(shapes,"Motor");                      ///  Funcionamiento del API
-        GE.start();                                                  ///
-    }*/
-
-   /* public static void main(String[] args){
-        ArrayList<Shape2d> shapes = new ArrayList<>();
-        shapes.add(new Rectangle(45, 250, 80, 80));
-        ((Rectangle) shapes.get(0)).setVelocity(new Vector2D(-400,600));
-        shapes.add(new Rectangle(350, 250, 80, 80));
-        ((Rectangle) shapes.get(1)).setVelocity(new Vector2D(-1500,0));
-        shapes.add(new Rectangle(350, 400, 80, 80));
-        ((Rectangle) shapes.get(2)).setVelocity(new Vector2D(5000,2221));
-
-        SimEngine GE = new SimEngine(shapes,"Motor"); // Funcionamiento del API
-        GE.start();
-    }*/
 
     public static void main(final String[] args) {
-        final ArrayList<Shape2d> shapes = new ArrayList<>();
-        shapes.add(new Rectangle(45, 200, 80, 80));
-        ((Rectangle) shapes.get(0)).setVelocity(new Vector2D(-500, 500));
-        shapes.add(new Rectangle(245, 200, 80, 80));
-        ((Rectangle) shapes.get(1)).setVelocity(new Vector2D(-500, 500));
-        shapes.add(new Rectangle(445, 200, 80, 80));
-        ((Rectangle) shapes.get(2)).setVelocity(new Vector2D(500, -500));
-        shapes.add(new Rectangle(645, 200, 80, 80));
-        ((Rectangle) shapes.get(3)).setVelocity(new Vector2D(500, 500));
-        shapes.add(new Rectangle(805, 200, 80, 80));
-        ((Rectangle) shapes.get(4)).setVelocity(new Vector2D(-500, 500));
-        shapes.add(new Rectangle(1005, 200, 80, 80));
-        ((Rectangle) shapes.get(5)).setVelocity(new Vector2D(500, -500));
-        shapes.add(new Rectangle(205, 500, 80, 80));
-        ((Rectangle) shapes.get(6)).setVelocity(new Vector2D(-500, 500));
-        shapes.add(new Rectangle(500, 500, 80, 80));
-        ((Rectangle) shapes.get(7)).setVelocity(new Vector2D(-500, 500));
-        shapes.add(new Rectangle(800, 500, 80, 80));
-        ((Rectangle) shapes.get(8)).setVelocity(new Vector2D(500, -500));
+        final List<Shape2d> shapes = new ArrayList<>();
 
-        final SimEngine GE = new SimEngine(shapes, "Motor"); // Funcionamiento del API
-        GE.start();
+        shapes.add(platform(115, 620, 210, 40));
+        shapes.add(platform(370, 580, 140, 35));
+        shapes.add(platform(610, 625, 170, 30));
+
+        shapes.add(rectangle(120, 100, 58, 58, 220, 40));
+        shapes.add(rectangle(500, 120, 64, 64, -180, 20));
+        shapes.add(circle(320, 60, 24, 150, 10));
+        shapes.add(circle(650, 90, 28, -210, 30));
+
+        final SimEngine engine = new SimEngine(shapes, "2D Physics Simulator");
+        engine.start();
+    }
+
+    private static Rectangle platform(double x, double y, double width, double height) {
+        Rectangle platform = new Rectangle(x, y, width, height);
+        platform.setStatic(true);
+        return platform;
+    }
+
+    private static Rectangle rectangle(double x, double y, double width, double height, double vx, double vy) {
+        Rectangle rectangle = new Rectangle(x, y, width, height);
+        rectangle.setVelocity(new Vector2D(vx, vy));
+        return rectangle;
+    }
+
+    private static Circle circle(double x, double y, double radius, double vx, double vy) {
+        Circle circle = new Circle(x, y, radius);
+        circle.setVelocity(new Vector2D(vx, vy));
+        return circle;
     }
 }

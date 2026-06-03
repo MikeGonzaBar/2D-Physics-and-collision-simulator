@@ -1,37 +1,56 @@
 package ProyectoPOO.Engine;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import ProyectoPOO.Shapes2D.*;
 
+/**
+ * Applies frame forces, such as gravity, to the active simulation shapes.
+ */
 public class Forces {
-    private ArrayList<Shape2d> shapes;
+    private static final double LINEAR_DAMPING = 0.2;
+
+    private final List<Shape2d> shapes;
     public double gravity;
 
-    public Forces(ArrayList<Shape2d> shapes, double gravity){
+    public Forces(List<Shape2d> shapes, double gravity) {
         this.shapes = shapes;
         this.gravity = gravity;
     }
 
-    public void applyGravityCircles(){
-        for(int i = 0; i < shapes.size(); i++){
-            Shape2d o = shapes.get(i);
-            if(o instanceof Circle){
-                Circle c1 = (Circle) o;
-                c1.addAcceleration(new Vector2D(0,gravity));
+    public void applyGravity() {
+        synchronized (shapes) {
+            for (Shape2d shape : shapes) {
+                if (shape.isAffectedByGravity()) {
+                    shape.addAcceleration(new Vector2D(0, gravity));
+                }
             }
         }
     }
 
-    public void sumForces(double passedTime){
-        for(int i = 0; i < shapes.size(); i++){
-            Shape2d o = shapes.get(i);
-            if(o instanceof Circle){
-                Circle c1 = (Circle) o;
-                Vector2D acceleration = c1.sumAccelerations();
-                c1.getVelocity().setX(c1.getVx()+acceleration.getX()*passedTime);
-                c1.getVelocity().setY(c1.getVy()+acceleration.getY()*passedTime);
-                c1.setVelocity(c1.getVx()*(1.0 - (passedTime * 0.2)),c1.getVy()*(1.0 - (passedTime * 0.2)));
+    /**
+     * @deprecated Use {@link #applyGravity()}.
+     */
+    @Deprecated
+    public void applyGravityCircles() {
+        applyGravity();
+    }
+
+    public void sumForces(double passedTime) {
+        synchronized (shapes) {
+            for (Shape2d shape : shapes) {
+                if (shape.isStatic()) {
+                    shape.sumAccelerations();
+                    continue;
+                }
+
+                Vector2D acceleration = shape.sumAccelerations();
+                shape.setVelocity(
+                    (shape.getVx() + acceleration.getX() * passedTime)
+                        * (1.0 - passedTime * LINEAR_DAMPING),
+                    (shape.getVy() + acceleration.getY() * passedTime)
+                        * (1.0 - passedTime * LINEAR_DAMPING)
+                );
             }
         }
     }

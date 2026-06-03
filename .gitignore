@@ -1,0 +1,15 @@
+# Java build outputs
+bin/
+build/
+doc/
+*.class
+
+# Local Codex/runtime artifacts
+.codex-build/
+.codex-tools/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
